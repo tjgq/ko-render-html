@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+<title>ko-html-render tests</title>
+<link rel="stylesheet" href="../bower_components/mocha/mocha.css" />
+</head>
+<body>
+
+<div id="mocha"></div>
+
+<script src="../vendor/knockout-3.0.0.js"></script>
+<script src="../vendor/knockout.mapping-2.4.1.js"></script>
+
+<script src="../dist/koRenderHtml.js"></script>
+
+<script src="../bower_components/mocha/mocha.js"></script>
+<script src="../bower_components/chai/chai.js"></script>
+<script src="/testem.js"></script>
+
+<script>
+  mocha.setup('bdd')
+  assert = chai.assert
+  expect = chai.expect
+  chai.should()
+</script>
+
+<script src="js-built/test.js"></script>
+
+<script>
+  mocha.run()
+</script>
+
+</body>
+</html>
