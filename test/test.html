@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>ko-html-render tests</title>
-<link rel="stylesheet" href="../bower_components/mocha/mocha.css" />
+<link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
 </head>
 <body>
 
@@ -13,15 +13,12 @@
 
 <script src="../dist/koRenderHtml.js"></script>
 
-<script src="../bower_components/mocha/mocha.js"></script>
-<script src="../bower_components/chai/chai.js"></script>
+<script src="../node_modules/mocha/mocha.js"></script>
+<script src="../node_modules/expect.js/expect.js"></script>
 <script src="/testem.js"></script>
 
 <script>
   mocha.setup('bdd')
-  assert = chai.assert
-  expect = chai.expect
-  chai.should()
 </script>
 
 <script src="js-built/test.js"></script>
