@@ -2,6 +2,8 @@
 
 Renders a [knockout.js](http://knockoutjs.com) view model into an HTML template.
 
+Currently does not work on IE < 9.
+
 A single global function is exposed:
 
 ### koRenderHtml(html, model, [map])
