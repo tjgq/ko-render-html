@@ -78,7 +78,7 @@
       html = '<div><!-- ko if: cond -->42<!-- /ko --></div>';
       return expect(koRenderHtml(templ, model)).to.equal(html);
     });
-    it('should render template with virtual matching if binding', function() {
+    it('should render template with virtual non-matching if binding', function() {
       var html, model, templ;
       templ = '<div><!-- ko if: cond -->42<!-- /ko --></div>';
       model = ko.mapping.fromJS({
@@ -87,21 +87,31 @@
       html = '<div><!-- ko if: cond --><!-- /ko --></div>';
       return expect(koRenderHtml(templ, model)).to.equal(html);
     });
-    it('should render template with no bindings and map function', function() {
+    it('should render template with identity map function', function() {
       var html, map, model, templ;
-      templ = '<div><span id="spam"></span><span id="eggs"></span></div>';
+      templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="text: foo"></span></div>';
       model = ko.mapping.fromJS({
         foo: 'foo'
       });
       map = function(node) {
-        if (node.id !== 'spam') {
-          return node;
-        }
+        return node;
       };
-      html = '<div><span id="eggs"></span></div>';
+      html = '<div><span id="spam"></span>\n<span id="eggs" data-bind="text: foo">foo</span></div>';
       return expect(koRenderHtml(templ, model, map)).to.equal(html);
     });
-    it('should render template with text binding and map function', function() {
+    it('should render template with null map function', function() {
+      var html, map, model, templ;
+      templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="text: foo"></span></div>';
+      model = ko.mapping.fromJS({
+        foo: 'foo'
+      });
+      map = function(node) {
+        return null;
+      };
+      html = '';
+      return expect(koRenderHtml(templ, model, map)).to.equal(html);
+    });
+    it('should render template with a map function that omits a node', function() {
       var html, map, model, templ;
       templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="text: foo"></span></div>';
       model = ko.mapping.fromJS({
@@ -113,6 +123,78 @@
         }
       };
       html = '<div>\n<span id="eggs" data-bind="text: foo">foo</span></div>';
+      return expect(koRenderHtml(templ, model, map)).to.equal(html);
+    });
+    it('should render template with a map function that replaces a node', function() {
+      var html, map, model, templ;
+      templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="text: foo"></span></div>';
+      model = ko.mapping.fromJS({
+        foo: 'foo'
+      });
+      map = function(node) {
+        var div;
+        if (node.id !== 'spam') {
+          return node;
+        }
+        div = document.createElement('div');
+        div.setAttribute('id', 'bacon');
+        return div;
+      };
+      html = '<div><div id="bacon"></div>\n<span id="eggs" data-bind="text: foo">foo</span></div>';
+      return expect(koRenderHtml(templ, model, map)).to.equal(html);
+    });
+    it('should render template with a map function that sets an attribute', function() {
+      var html, map, model, templ;
+      templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="text: foo"></span></div>';
+      model = ko.mapping.fromJS({
+        foo: 'foo'
+      });
+      map = function(node) {
+        if (node.id === 'spam') {
+          node.setAttribute('id', 'bacon');
+        }
+        return node;
+      };
+      html = '<div><span id="bacon"></span>\n<span id="eggs" data-bind="text: foo">foo</span></div>';
+      return expect(koRenderHtml(templ, model, map)).to.equal(html);
+    });
+    it('should render template with a map function that removes the data-bind attribute', function() {
+      var html, map, model, templ;
+      templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="text: foo"></span></div>';
+      model = ko.mapping.fromJS({
+        foo: 'foo'
+      });
+      map = function(node) {
+        if (node.nodeType === 1) {
+          node.removeAttribute('data-bind');
+        }
+        return node;
+      };
+      html = '<div><span id="spam"></span>\n<span id="eggs">foo</span></div>';
+      return expect(koRenderHtml(templ, model, map)).to.equal(html);
+    });
+    it('should render template with a map function that replaces a node with a tree', function() {
+      var html, map, model, templ;
+      templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="text: foo"></span></div>';
+      model = ko.mapping.fromJS({
+        foo: 'foo'
+      });
+      map = function(node) {
+        var firstChild, parent, secondChild;
+        if (node.id !== 'spam') {
+          return node;
+        }
+        parent = document.createElement('div');
+        parent.setAttribute('id', 'bacon');
+        firstChild = document.createElement('p');
+        firstChild.setAttribute('id', 'lobster');
+        secondChild = document.createElement('p');
+        secondChild.setAttribute('id', 'thermidor');
+        parent.appendChild(firstChild);
+        parent.appendChild(secondChild);
+        return parent;
+      };
+      html = '<div><div id="bacon"><p id="lobster"></p><p id="thermidor"></p></div>\n<span id="eggs" data-bind="text: foo">foo</span></div>';
       return expect(koRenderHtml(templ, model, map)).to.equal(html);
     });
     it('should render template with matching visible binding and map function', function() {

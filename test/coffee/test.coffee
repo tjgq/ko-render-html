@@ -63,23 +63,35 @@ describe 'koRenderHtml', ->
         html = '''<div><!-- ko if: cond -->42<!-- /ko --></div>'''
         expect( koRenderHtml(templ, model) ).to.equal(html)
 
-    it 'should render template with virtual matching if binding', ->
+    it 'should render template with virtual non-matching if binding', ->
         templ = '''<div><!-- ko if: cond -->42<!-- /ko --></div>'''
         model = ko.mapping.fromJS
             cond: false
         html = '''<div><!-- ko if: cond --><!-- /ko --></div>'''
         expect( koRenderHtml(templ, model) ).to.equal(html)
 
-    it 'should render template with no bindings and map function', ->
-        templ = '''<div><span id="spam"></span><span id="eggs"></span></div>'''
+    it 'should render template with identity map function', ->
+        templ = '''<div><span id="spam"></span>
+                        <span id="eggs" data-bind="text: foo"></span></div>'''
         model = ko.mapping.fromJS
             foo: 'foo'
         map = (node) ->
-            if node.id isnt 'spam' then node
-        html = '''<div><span id="eggs"></span></div>'''
+            node
+        html = '''<div><span id="spam"></span>
+                       <span id="eggs" data-bind="text: foo">foo</span></div>'''
         expect( koRenderHtml(templ, model, map) ).to.equal(html)
 
-    it 'should render template with text binding and map function', ->
+    it 'should render template with null map function', ->
+        templ = '''<div><span id="spam"></span>
+                        <span id="eggs" data-bind="text: foo"></span></div>'''
+        model = ko.mapping.fromJS
+            foo: 'foo'
+        map = (node) ->
+            null
+        html = ''
+        expect( koRenderHtml(templ, model, map) ).to.equal(html)
+
+    it 'should render template with a map function that omits a node', ->
         templ = '''<div><span id="spam"></span>
                         <span id="eggs" data-bind="text: foo"></span></div>'''
         model = ko.mapping.fromJS
@@ -87,6 +99,66 @@ describe 'koRenderHtml', ->
         map = (node) ->
             if node.id isnt 'spam' then node
         html = '''<div>
+                       <span id="eggs" data-bind="text: foo">foo</span></div>'''
+        expect( koRenderHtml(templ, model, map) ).to.equal(html)
+
+    it 'should render template with a map function that replaces a node', ->
+        templ = '''<div><span id="spam"></span>
+                        <span id="eggs" data-bind="text: foo"></span></div>'''
+        model = ko.mapping.fromJS
+            foo: 'foo'
+        map = (node) ->
+            if node.id isnt 'spam' then return node
+            div = document.createElement('div')
+            div.setAttribute('id', 'bacon')
+            return div
+        html = '''<div><div id="bacon"></div>
+                       <span id="eggs" data-bind="text: foo">foo</span></div>'''
+        expect( koRenderHtml(templ, model, map) ).to.equal(html)
+
+    it 'should render template with a map function that sets an attribute', ->
+        templ = '''<div><span id="spam"></span>
+                        <span id="eggs" data-bind="text: foo"></span></div>'''
+        model = ko.mapping.fromJS
+            foo: 'foo'
+        map = (node) ->
+            if node.id is 'spam'
+                node.setAttribute('id', 'bacon')
+            return node
+        html = '''<div><span id="bacon"></span>
+                       <span id="eggs" data-bind="text: foo">foo</span></div>'''
+        expect( koRenderHtml(templ, model, map) ).to.equal(html)
+
+    it 'should render template with a map function that removes the data-bind attribute', ->
+        templ = '''<div><span id="spam"></span>
+                        <span id="eggs" data-bind="text: foo"></span></div>'''
+        model = ko.mapping.fromJS
+            foo: 'foo'
+        map = (node) ->
+            if node.nodeType is 1
+                node.removeAttribute('data-bind')
+            return node
+        html = '''<div><span id="spam"></span>
+                       <span id="eggs">foo</span></div>'''
+        expect( koRenderHtml(templ, model, map) ).to.equal(html)
+
+    it 'should render template with a map function that replaces a node with a tree', ->
+        templ = '''<div><span id="spam"></span>
+                        <span id="eggs" data-bind="text: foo"></span></div>'''
+        model = ko.mapping.fromJS
+            foo: 'foo'
+        map = (node) ->
+            if node.id isnt 'spam' then return node
+            parent = document.createElement('div')
+            parent.setAttribute('id', 'bacon')
+            firstChild = document.createElement('p')
+            firstChild.setAttribute('id', 'lobster')
+            secondChild = document.createElement('p')
+            secondChild.setAttribute('id', 'thermidor')
+            parent.appendChild(firstChild)
+            parent.appendChild(secondChild)
+            return parent
+        html = '''<div><div id="bacon"><p id="lobster"></p><p id="thermidor"></p></div>
                        <span id="eggs" data-bind="text: foo">foo</span></div>'''
         expect( koRenderHtml(templ, model, map) ).to.equal(html)
 
