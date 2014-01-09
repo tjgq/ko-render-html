@@ -1,4 +1,4 @@
-# koRenderHtml
+# ko-render-html
 
 Renders a [knockout.js](http://knockoutjs.com) view model into an HTML template.
 
