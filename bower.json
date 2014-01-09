@@ -1,0 +1,19 @@
+{
+  "name": "ko-render-html",
+  "version": "0.0.1",
+  "description": "Renders a knockout.js view model into an HTML template.",
+  "keywords": [ "knockout", "html", "render", "template" ],
+  "authors": [
+    "Tiago Quelhas <tiagoq@gmail.com>"
+  ],
+  "homepage": "https://github.com/tjgq/ko-render-html",
+  "license": "BSD",
+  "main": "dist/koRenderHtml.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
