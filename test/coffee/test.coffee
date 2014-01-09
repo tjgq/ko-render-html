@@ -70,58 +70,58 @@ describe 'koRenderHtml', ->
         html = '''<div><!-- ko if: cond --><!-- /ko --></div>'''
         expect( koRenderHtml(templ, model) ).to.equal(html)
 
-    it 'should render template with no bindings and filter function', ->
+    it 'should render template with no bindings and map function', ->
         templ = '''<div><span id="spam"></span><span id="eggs"></span></div>'''
         model = ko.mapping.fromJS
             foo: 'foo'
-        filter = (node) ->
-            node.id isnt 'spam'
+        map = (node) ->
+            if node.id isnt 'spam' then node
         html = '''<div><span id="eggs"></span></div>'''
-        expect( koRenderHtml(templ, model, filter) ).to.equal(html)
+        expect( koRenderHtml(templ, model, map) ).to.equal(html)
 
-    it 'should render template with text binding and filter function', ->
+    it 'should render template with text binding and map function', ->
         templ = '''<div><span id="spam"></span>
                         <span id="eggs" data-bind="text: foo"></span></div>'''
         model = ko.mapping.fromJS
             foo: 'foo'
-        filter = (node) ->
-            node.id isnt 'spam'
+        map = (node) ->
+            if node.id isnt 'spam' then node
         html = '''<div>
                        <span id="eggs" data-bind="text: foo">foo</span></div>'''
-        expect( koRenderHtml(templ, model, filter) ).to.equal(html)
+        expect( koRenderHtml(templ, model, map) ).to.equal(html)
 
-    it 'should render template with matching visible binding and filter function', ->
+    it 'should render template with matching visible binding and map function', ->
         templ = '''<div><span id="spam"></span>
                         <span id="eggs" data-bind="visible: cond"></span></div>'''
         model = ko.mapping.fromJS
             cond: true
-        filter = (node) ->
-            node.id isnt 'spam'
+        map = (node) ->
+            if node.id isnt 'spam' then node
         html = '''<div>
                        <span id="eggs" data-bind="visible: cond"></span></div>'''
-        expect( koRenderHtml(templ, model, filter) ).to.equal(html)
+        expect( koRenderHtml(templ, model, map) ).to.equal(html)
 
-    it 'should render template with non-matching visible binding and filter function', ->
+    it 'should render template with non-matching visible binding and map function', ->
         templ = '''<div><span id="spam"></span>
                         <span id="eggs" data-bind="visible: cond"></span></div>'''
         model = ko.mapping.fromJS
             cond: false
-        filter = (node) ->
-            node.id isnt 'spam'
+        map = (node) ->
+            if node.id isnt 'spam' then node
         html = '''<div>
                        </div>'''
-        expect( koRenderHtml(templ, model, filter) ).to.equal(html)
+        expect( koRenderHtml(templ, model, map) ).to.equal(html)
 
-    it 'should render template with non-matching visible binding followed by matching visible binding and filter function', ->
+    it 'should render template with non-matching visible binding followed by matching visible binding and map function', ->
         templ = '''<div><span id="spam"></span>
                         <span id="eggs" data-bind="visible: condFirst"></span>
                         <span id="bacon" data-bind="visible: condSecond"></span></div>'''
         model = ko.mapping.fromJS
             condFirst: false
             condSecond: true
-        filter = (node) ->
-            node.id isnt 'spam'
+        map = (node) ->
+            if node.id isnt 'spam' then node
         html = '''<div>
 
                        <span id="bacon" data-bind="visible: condSecond"></span></div>'''
-        expect( koRenderHtml(templ, model, filter) ).to.equal(html)
+        expect( koRenderHtml(templ, model, map) ).to.equal(html)

@@ -1,22 +1,25 @@
 (function() {
-  var filterDom;
+  var identity, walkDom;
 
   if (!window.ko) {
     throw new Error('koRenderHtml requires knockout.js');
   }
 
-  filterDom = function(root, filter) {
-    var current, next;
-    if (filter == null) {
-      filter = (function() {
-        return true;
-      });
-    }
+  identity = function(x) {
+    return x;
+  };
+
+  walkDom = function(root, map) {
+    var current, newCurrent, next;
     current = root != null ? root.firstChild : void 0;
     while (current) {
       next = current != null ? current.nextSibling : void 0;
-      if (filter(current)) {
-        filterDom(current, filter);
+      newCurrent = map(current);
+      if (newCurrent != null) {
+        if (newCurrent !== current) {
+          root.replaceChild(newCurrent, current);
+        }
+        walkDom(newCurrent, map);
       } else {
         root.removeChild(current);
       }
@@ -25,19 +28,21 @@
     return root;
   };
 
-  window.koRenderHtml = function(template, model, filter) {
+  window.koRenderHtml = function(template, model, map) {
     var container;
-    if (filter == null) {
-      filter = (function() {
-        return true;
-      });
+    if (map == null) {
+      map = identity;
     }
     container = document.createElement('div');
     container.innerHTML = template;
     ko.applyBindings(model, container);
-    filterDom(container, function(node) {
+    walkDom(container, function(node) {
       var _ref;
-      return (node != null ? (_ref = node.style) != null ? _ref.display : void 0 : void 0) !== 'none' && filter(node);
+      if ((node != null ? (_ref = node.style) != null ? _ref.display : void 0 : void 0) === 'none') {
+        return null;
+      } else {
+        return map(node);
+      }
     });
     return container.innerHTML;
   };

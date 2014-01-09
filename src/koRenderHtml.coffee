@@ -1,24 +1,30 @@
 unless window.ko then throw new Error 'koRenderHtml requires knockout.js'
 
-# Remove nodes not matching filterFn from the DOM rooted at root.
-filterDom = (root, filter = (-> true)) ->
+identity = (x) -> x
+
+# Walk the DOM rooted at root and transform each node through a map function.
+walkDom = (root, map) ->
     current = root?.firstChild
     while current
         next = current?.nextSibling
-        if filter(current)
-            filterDom(current, filter)
+        newCurrent = map(current)
+        if newCurrent?
+            if newCurrent isnt current
+                root.replaceChild(newCurrent, current)
+            walkDom(newCurrent, map)
         else
             root.removeChild(current)
         current = next
     root
 
-# Render an HTML template with knockout.js bindings
-# given a knockout.js view model.
-# Optionally filter out any elements not matching filter.
-window.koRenderHtml = (template, model, filter = (-> true)) ->
+# Render an HTML template with knockout.js bindings given a knockout.js
+# view model. The map function is called for each node in the resulting
+# DOM. The original node is replaced by the returned node, or removed if
+# the return value is null.
+window.koRenderHtml = (template, model, map = identity) ->
     container = document.createElement('div')
     container.innerHTML = template
     ko.applyBindings(model, container)
-    filterDom container, (node) ->
-        node?.style?.display isnt 'none' and filter(node)
+    walkDom container, (node) ->
+        if node?.style?.display is 'none' then null else map(node)
     container.innerHTML

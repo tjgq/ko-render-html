@@ -87,66 +87,76 @@
       html = '<div><!-- ko if: cond --><!-- /ko --></div>';
       return expect(koRenderHtml(templ, model)).to.equal(html);
     });
-    it('should render template with no bindings and filter function', function() {
-      var filter, html, model, templ;
+    it('should render template with no bindings and map function', function() {
+      var html, map, model, templ;
       templ = '<div><span id="spam"></span><span id="eggs"></span></div>';
       model = ko.mapping.fromJS({
         foo: 'foo'
       });
-      filter = function(node) {
-        return node.id !== 'spam';
+      map = function(node) {
+        if (node.id !== 'spam') {
+          return node;
+        }
       };
       html = '<div><span id="eggs"></span></div>';
-      return expect(koRenderHtml(templ, model, filter)).to.equal(html);
+      return expect(koRenderHtml(templ, model, map)).to.equal(html);
     });
-    it('should render template with text binding and filter function', function() {
-      var filter, html, model, templ;
+    it('should render template with text binding and map function', function() {
+      var html, map, model, templ;
       templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="text: foo"></span></div>';
       model = ko.mapping.fromJS({
         foo: 'foo'
       });
-      filter = function(node) {
-        return node.id !== 'spam';
+      map = function(node) {
+        if (node.id !== 'spam') {
+          return node;
+        }
       };
       html = '<div>\n<span id="eggs" data-bind="text: foo">foo</span></div>';
-      return expect(koRenderHtml(templ, model, filter)).to.equal(html);
+      return expect(koRenderHtml(templ, model, map)).to.equal(html);
     });
-    it('should render template with matching visible binding and filter function', function() {
-      var filter, html, model, templ;
+    it('should render template with matching visible binding and map function', function() {
+      var html, map, model, templ;
       templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="visible: cond"></span></div>';
       model = ko.mapping.fromJS({
         cond: true
       });
-      filter = function(node) {
-        return node.id !== 'spam';
+      map = function(node) {
+        if (node.id !== 'spam') {
+          return node;
+        }
       };
       html = '<div>\n<span id="eggs" data-bind="visible: cond"></span></div>';
-      return expect(koRenderHtml(templ, model, filter)).to.equal(html);
+      return expect(koRenderHtml(templ, model, map)).to.equal(html);
     });
-    it('should render template with non-matching visible binding and filter function', function() {
-      var filter, html, model, templ;
+    it('should render template with non-matching visible binding and map function', function() {
+      var html, map, model, templ;
       templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="visible: cond"></span></div>';
       model = ko.mapping.fromJS({
         cond: false
       });
-      filter = function(node) {
-        return node.id !== 'spam';
+      map = function(node) {
+        if (node.id !== 'spam') {
+          return node;
+        }
       };
       html = '<div>\n</div>';
-      return expect(koRenderHtml(templ, model, filter)).to.equal(html);
+      return expect(koRenderHtml(templ, model, map)).to.equal(html);
     });
-    return it('should render template with non-matching visible binding followed by matching visible binding and filter function', function() {
-      var filter, html, model, templ;
+    return it('should render template with non-matching visible binding followed by matching visible binding and map function', function() {
+      var html, map, model, templ;
       templ = '<div><span id="spam"></span>\n<span id="eggs" data-bind="visible: condFirst"></span>\n<span id="bacon" data-bind="visible: condSecond"></span></div>';
       model = ko.mapping.fromJS({
         condFirst: false,
         condSecond: true
       });
-      filter = function(node) {
-        return node.id !== 'spam';
+      map = function(node) {
+        if (node.id !== 'spam') {
+          return node;
+        }
       };
       html = '<div>\n\n<span id="bacon" data-bind="visible: condSecond"></span></div>';
-      return expect(koRenderHtml(templ, model, filter)).to.equal(html);
+      return expect(koRenderHtml(templ, model, map)).to.equal(html);
     });
   });
 
