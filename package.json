@@ -1,16 +1,19 @@
 {
   "name": "ko-render-html",
-  "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Tiago Quelhas",
+  "version": "0.0.1",
+  "description": "Renders a knockout.js view model into an HTML template.",
+  "keywords": ["knockout", "html", "render", "template"],
+  "author": "Tiago Quelhas <tiagoq@gmail.com>",
   "license": "BSD",
+  "repository" : {
+    "type" : "git",
+    "url" : "http://github.com/tjgq/ko-render-html"
+  },
+  "homepage": "http://github.com/tjgq/ko-render-html",
+  "bugs": {
+    "url": "http://github.com/tjgq/ko-render-html/issues",
+    "email": "tiagoq@gmail.com"
+  },
   "devDependencies": {
     "coffee-script": "~1.6.3",
     "grunt-contrib-coffee": "~0.8.0",
